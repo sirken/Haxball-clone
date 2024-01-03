@@ -95,50 +95,96 @@ function goalkeeperBot(player, args = {}) {
     var ball = discs[0];
     var input = 0;
 
-    if (player.team.id == haxball.Team.BLUE.id) { //TODO : Miror
+    if (player.team.id == haxball.Team.BLUE.id) {
 
-    }
 
-    if (game.state == 0) {
-        if (player.avatar != "1") {
-            this.avatar = "1";
-            this.avatarContext = createAvatarCanvas();
-            this.avatarPattern = getAvatarPattern(this.avatarContext, this.avatar, this.team === haxball.Team.BLUE ? [getDecimalFromRGB(haxball.Team.BLUE.color)] : [getDecimalFromRGB(haxball.Team.RED.color)]);
-        }
-        if (game.kickoffReset == 8) {
-            if (distDiscs(player.disc, ball) > 8 * player.disc.radius) {
-                chaseBallBot(player, args);
-                return;
-            }
-            else {
-                chaseBallBot(player, args);
-                return;
-            }
-        }
-    }
-    else if (game.state == 1) {
-        controllerPoint(player, positionKeeper(player, stadium.goals[0], ball), null, 1);
-        if (Math.sqrt((player.disc.x - ball.x) ** 2 + (player.disc.y - ball.y) ** 2) - ball.radius - player.disc.radius < 4) input += Input.SHOOT;
-        player.inputs += input;
-    }
-    else if (game.state == 2) {
-        player.inputs = 0;
-        if (currentFrame % 30 < 30 / 2) player.avatar = "😡";
-        else player.avatar = "🤬";
-        this.avatarContext = createAvatarCanvas();
-        this.avatarPattern = getAvatarPattern(player.avatarContext, player.avatar, player.team === haxball.Team.BLUE ? [getDecimalFromRGB(haxball.Team.BLUE.color)] : [getDecimalFromRGB(haxball.Team.RED.color)]);
-        if (currentFrame % 10 < 2) input += Input.SHOOT;
-        player.inputs += input;
+		if (game.state == 0) {
+		    if (player.avatar != "1") {
+		        this.avatar = "1";
+		        this.avatarContext = createAvatarCanvas();
+		        this.avatarPattern = getAvatarPattern(this.avatarContext, this.avatar, this.team === haxball.Team.BLUE ? [getDecimalFromRGB(haxball.Team.BLUE.color)] : [getDecimalFromRGB(haxball.Team.RED.color)]);
+		    }
+		    if (game.kickoffReset == 8) {
+		        if (distDiscs(player.disc, ball) > 8 * player.disc.radius) {
+		            chaseBallBot(player, args);
+		            return;
+		        }
+		        else {
+		            chaseBallBot(player, args);
+		            return;
+		        }
+		    }
+		}
+		else if (game.state == 1) {
+		    controllerPoint(player, positionKeeper(player, stadium.goals[1], ball), null, 1);
+		    if (Math.sqrt((player.disc.x - ball.x) ** 2 + (player.disc.y - ball.y) ** 2) - ball.radius - player.disc.radius < 4) input += Input.SHOOT;
+		    player.inputs += input;
+		}
+		else if (game.state == 2) {
+		    player.inputs = 0;
+		    if (currentFrame % 30 < 30 / 2) player.avatar = "😡";
+		    else player.avatar = "🤬";
+		    this.avatarContext = createAvatarCanvas();
+		    this.avatarPattern = getAvatarPattern(player.avatarContext, player.avatar, player.team === haxball.Team.BLUE ? [getDecimalFromRGB(haxball.Team.BLUE.color)] : [getDecimalFromRGB(haxball.Team.RED.color)]);
+		    if (currentFrame % 10 < 2) input += Input.SHOOT;
+		    player.inputs += input;
+		}
+
+
+    } else if (player.team.id == haxball.Team.RED.id) {
+
+
+		if (game.state == 0) {
+		    if (player.avatar != "1") {
+		        this.avatar = "1";
+		        this.avatarContext = createAvatarCanvas();
+		        this.avatarPattern = getAvatarPattern(this.avatarContext, this.avatar, this.team === haxball.Team.BLUE ? [getDecimalFromRGB(haxball.Team.BLUE.color)] : [getDecimalFromRGB(haxball.Team.RED.color)]);
+		    }
+		    if (game.kickoffReset == 8) {
+		        if (distDiscs(player.disc, ball) > 8 * player.disc.radius) {
+		            chaseBallBot(player, args);
+		            return;
+		        }
+		        else {
+		            chaseBallBot(player, args);
+		            return;
+		        }
+		    }
+		}
+		else if (game.state == 1) {
+		    controllerPoint(player, positionKeeper(player, stadium.goals[0], ball), null, 1);
+		    if (Math.sqrt((player.disc.x - ball.x) ** 2 + (player.disc.y - ball.y) ** 2) - ball.radius - player.disc.radius < 4) input += Input.SHOOT;
+		    player.inputs += input;
+		}
+		else if (game.state == 2) {
+		    player.inputs = 0;
+		    if (currentFrame % 30 < 30 / 2) player.avatar = "😡";
+		    else player.avatar = "🤬";
+		    this.avatarContext = createAvatarCanvas();
+		    this.avatarPattern = getAvatarPattern(player.avatarContext, player.avatar, player.team === haxball.Team.BLUE ? [getDecimalFromRGB(haxball.Team.BLUE.color)] : [getDecimalFromRGB(haxball.Team.RED.color)]);
+		    if (currentFrame % 10 < 2) input += Input.SHOOT;
+		    player.inputs += input;
+		}
+
+
     }
 }
 
 function positionKeeper(player, goal, ball) {
     var centerGoal = { "x": (goal.p0[0] + goal.p1[0]) / 2, "y": (goal.p0[1] + goal.p1[1]) / 2 };
-    var intersection = segment_intersection(centerGoal.x, centerGoal.y, ball.x, ball.y, -315, goal.p0[1], -315, goal.p1[1]);
+
+	// x offset for goalies
+	if (player.team.id == haxball.Team.RED.id) {
+		var goalkeeperOffset = -315;
+	} else if (player.team.id == haxball.Team.BLUE.id) {
+		var goalkeeperOffset = 315;
+	} 
+
+    var intersection = segment_intersection(centerGoal.x, centerGoal.y, ball.x, ball.y, goalkeeperOffset, goal.p0[1], goalkeeperOffset, goal.p1[1]);
     if (!intersection) {
-        intersection = segment_intersection(centerGoal.x, centerGoal.y, ball.x, ball.y, goal.p0[0], goal.p0[1], -315, goal.p0[1]);
+        intersection = segment_intersection(centerGoal.x, centerGoal.y, ball.x, ball.y, goal.p0[0], goal.p0[1], goalkeeperOffset, goal.p0[1]);
         if (!intersection) {
-            intersection = segment_intersection(centerGoal.x, centerGoal.y, ball.x, ball.y, goal.p1[0], goal.p1[1], -315, goal.p1[1]);
+            intersection = segment_intersection(centerGoal.x, centerGoal.y, ball.x, ball.y, goal.p1[0], goal.p1[1], goalkeeperOffset, goal.p1[1]);
             if (!intersection) {
                 intersection = segment_intersection(centerGoal.x, ball.y, ball.x, ball.y, goal.p0[0], goal.p0[1], goal.p1[0], goal.p1[1]);
             }
